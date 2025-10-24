@@ -64,12 +64,12 @@ namespace Projecto_final_FP_1_
 
                     case 2:
                         Console.Clear();
-                        //GestionDeVehiculos();
+                        //GestionDeVehiculos(informacionDECLIentes, informacionDeGestionDeVehículos);
                         break;
 
                     case 3:
                         Console.Clear();
-                        //GestionDeServiciosDeMantenimiento();
+                        //GestionDeServiciosDeMantenimiento(InformacionDeGestionDeVehículos, InformacionDeServicios);
                         break;
 
                     default:
@@ -112,7 +112,7 @@ namespace Projecto_final_FP_1_
                 switch (opcionClientes)
                 {
                     case 1:
-                        LogicaNuevaInfo(infoClientesOriginal, informacionDeClientes_1);
+                        informacionDeClientes_1 = LogicaNuevaInfo(infoClientesOriginal, informacionDeClientes_1);
                         Console.Clear();
                         break;
 
@@ -143,8 +143,7 @@ namespace Projecto_final_FP_1_
 
         static string[,] LogicaNuevaInfo(string[,] matrizOriginal, string[,] matrizDada)
         {
-            matrizOriginal = matrizDada;
-            matrizDada = new string[matrizDada.GetLength(0) + 1, matrizDada.GetLength(1) + 1];
+            matrizDada = new string[matrizOriginal.GetLength(0) + 1, matrizOriginal.GetLength(1)];
 
             for (int i = 0; i < matrizOriginal.GetLength(0); i++)
             {
@@ -162,13 +161,36 @@ namespace Projecto_final_FP_1_
             return matrizDada;
         }
 
+        static string[,] LogicaBorrarInfo(string[,] matrizOriginal, string[,] matrizDada)
+        {
+            int opcion = 0;
+            MostrarMatriz(matrizOriginal);
+
+            Console.WriteLine();
+            Console.Write("Elige la informacion que deseas editar o borrar: ");
+            opcion = int.Parse(Console.ReadLine());
+            return null;
+        }
+
         static void MostrarMatriz(string[,] matrizElegida)
         {
             for (int i = 0; i < matrizElegida.GetLength(0); i++)
             {
+                if (i != 0)
+                {
+                    Console.Write(i + ". ");
+                }
                 for (int j = 0; j < matrizElegida.GetLength(1); j++)
                 {
-                    Console.Write($"|      {matrizElegida[i, j]}      |");
+                    if (i == 0)
+                    {
+                        Console.Write($"|      {matrizElegida[i, j]}      |");
+                    }
+                    else
+                    {
+                        Console.Write($"|       {matrizElegida[i, j]}         |");
+                    }
+
                 }
                 Console.WriteLine();
             }
