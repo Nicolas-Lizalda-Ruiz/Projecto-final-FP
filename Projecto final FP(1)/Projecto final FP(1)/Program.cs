@@ -64,7 +64,9 @@ namespace Projecto_final_FP_1_
 
                     case 2:
                         Console.Clear();
-                        //GestionDeVehiculos(informacionDECLIentes, informacionDeGestionDeVehículos);
+                        informacionVehículos_0 = GestionDeVehiculos(informacionVehículos_0, informacionDeClientes_0);
+                        Console.WriteLine("Saliste de la gestión de vehículos");
+                        Console.WriteLine();
                         break;
 
                     case 3:
@@ -194,6 +196,235 @@ namespace Projecto_final_FP_1_
                 }
                 Console.WriteLine();
             }
+        }
+
+        static string[,] GestionDeVehiculos(string[,] infoVehiculos, string[,] infoClientes)
+        {
+            int opcionVehiculos = 0;
+
+            do
+            {
+                Console.WriteLine("Digita el numero de la opción para elegirla.");
+                Console.WriteLine("1. Registrar un nuevo vehículo.");
+                Console.WriteLine("2. Ver lista de vehículos registrados.");
+                Console.WriteLine("3. Editar información de un vehículo.");
+                Console.WriteLine("4. Asignar vehículo a un cliente.");
+                Console.WriteLine("5. Ver vehículos de un cliente específico.");
+                Console.WriteLine("6. Salir de Gestión de vehículos.");
+                Console.WriteLine();
+                Console.Write("Elige: ");
+                opcionVehiculos = int.Parse(Console.ReadLine());
+
+                if (opcionVehiculos < 1 || opcionVehiculos > 6)
+                {
+                    do
+                    {
+                        Console.Write("Opción no válida. Por favor, elige una opción entre 1 y 6: ");
+                        opcionVehiculos = Convert.ToInt32(Console.ReadLine());
+                    } while (opcionVehiculos < 1 || opcionVehiculos > 6);
+                }
+
+                switch (opcionVehiculos)
+                {
+                    case 1:
+                        if (infoVehiculos.GetLength(0) - 1 >= 20)
+                        {
+                            Console.WriteLine("No se pueden registrar más vehículos (límite de 20).");
+                        }
+                        else
+                        {
+                            if (infoVehiculos.GetLength(1) == 4)
+                            {
+                                infoVehiculos = LogicaNuevaInfo(infoVehiculos, infoVehiculos);
+                            }
+                            else if (infoVehiculos.GetLength(1) == 5)
+                            {
+                                int filas = infoVehiculos.GetLength(0);
+                                int columnas = infoVehiculos.GetLength(1);
+                                string[,] nuevaMatriz = new string[filas + 1, columnas];
+                                //copiar datos existentes
+                                for (int i = 0; i < filas; i++)
+                                    for (int j = 0; j < columnas; j++)
+                                        nuevaMatriz[i, j] = infoVehiculos[i, j];
+                                //pedir datos para las primeras 4 columnas
+                                for (int j = 0; j < 4; j++)
+                                {
+                                    Console.Write($"Ingresa la nueva información en {nuevaMatriz[0, j]}: ");
+                                    nuevaMatriz[filas, j] = Console.ReadLine();
+                                }
+                                //columna de cédula de cliente 
+                                nuevaMatriz[filas, 4] = "";
+                                infoVehiculos = nuevaMatriz;
+                            }
+                        }
+                        Console.Clear();
+                        break;
+
+                    case 2:
+                        //mostrar lista de vehículos
+                        Console.Clear();
+                        MostrarMatriz(infoVehiculos);
+                        break;
+
+                    case 3:
+                        //editar vehículo por placa
+                        Console.Clear();
+                        if (infoVehiculos.GetLength(0) > 1)
+                        {
+                            Console.Write("Ingrese la placa del vehículo a editar: ");
+                            string placaBuscar = Console.ReadLine();
+                            int fila = -1;
+                            for (int i = 1; i < infoVehiculos.GetLength(0); i++)
+                            {
+                                if (infoVehiculos[i, 2] == placaBuscar)
+                                {
+                                    fila = i;
+                                    break;
+                                }
+                            }
+                            if (fila == -1)
+                            {
+                                Console.WriteLine("Vehículo no encontrado.");
+                            }
+                            else
+                            {
+                                Console.Write($"Marca actual ({infoVehiculos[fila, 0]}), nueva marca: ");
+                                string nuevaMarca = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(nuevaMarca))
+                                    infoVehiculos[fila, 0] = nuevaMarca;
+
+                                Console.Write($"Modelo actual ({infoVehiculos[fila, 1]}), nuevo modelo: ");
+                                string nuevoModelo = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(nuevoModelo))
+                                    infoVehiculos[fila, 1] = nuevoModelo;
+
+                                Console.Write($"Año actual ({infoVehiculos[fila, 3]}), nuevo año: ");
+                                string nuevoAnio = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(nuevoAnio))
+                                    infoVehiculos[fila, 3] = nuevoAnio;
+
+                                Console.WriteLine("Información actualizada.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No hay vehículos registrados para editar.");
+                        }
+                        break;
+
+                    case 4:
+                        //asignar vehículo a cliente
+                        Console.Clear();
+                        //si no existe columna para cliente la agrega
+                        if (infoVehiculos.GetLength(1) == 4)
+                        {
+                            int filas = infoVehiculos.GetLength(0);
+                            string[,] nuevaMatriz2 = new string[filas, 5];
+
+                            for (int i = 0; i < filas; i++)
+                                for (int j = 0; j < 4; j++)
+                                    nuevaMatriz2[i, j] = infoVehiculos[i, j];
+                            nuevaMatriz2[0, 4] = "//--CedulaCliente--//";
+                            for (int i = 1; i < filas; i++)
+                                nuevaMatriz2[i, 4] = "";
+                            infoVehiculos = nuevaMatriz2;
+                        }
+                        if (infoVehiculos.GetLength(0) > 1)
+                        {
+                            Console.Write("Ingrese la placa del vehículo a asignar: ");
+                            string placaAsignar = Console.ReadLine();
+                            int filaVeh = -1;
+                            for (int i = 1; i < infoVehiculos.GetLength(0); i++)
+                            {
+                                if (infoVehiculos[i, 2] == placaAsignar)
+                                {
+                                    filaVeh = i;
+                                    break;
+                                }
+                            }
+                            if (filaVeh == -1)
+                            {
+                                Console.WriteLine("Vehículo no encontrado.");
+                            }
+                            else
+                            {
+                                Console.Write("Ingrese la cédula del cliente: ");
+                                string cedulaCliente = Console.ReadLine();
+                                int filaCliente = -1;
+                                for (int i = 1; i < infoClientes.GetLength(0); i++)
+                                {
+                                    if (infoClientes[i, 1] == cedulaCliente)
+                                    {
+                                        filaCliente = i;
+                                        break;
+                                    }
+                                }
+                                if (filaCliente == -1)
+                                {
+                                    Console.WriteLine("Cliente no encontrado.");
+                                }
+                                else
+                                {
+                                    infoVehiculos[filaVeh, 4] = infoClientes[filaCliente, 1];
+                                    Console.WriteLine("Vehículo asignado exitosamente.");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No hay vehículos registrados.");
+                        }
+                        break;
+
+                    case 5:
+                        //ver vehículos de un cliente específico
+                        Console.Clear();
+                        Console.Write("Ingrese la cédula del cliente: ");
+                        string cedulaBuscar = Console.ReadLine();
+                        int filaCli = -1;
+                        for (int i = 1; i < infoClientes.GetLength(0); i++)
+                        {
+                            if (infoClientes[i, 1] == cedulaBuscar)
+                            {
+                                filaCli = i;
+                                break;
+                            }
+                        }
+                        if (filaCli == -1)
+                        {
+                            Console.WriteLine("Cliente no encontrado.");
+                        }
+                        else
+                        {
+                            bool tieneVehiculos = false;
+                            for (int i = 1; i < infoVehiculos.GetLength(0); i++)
+                            {
+                                if (infoVehiculos.GetLength(1) == 5 && infoVehiculos[i, 4] == cedulaBuscar)
+                                {
+                                    if (!tieneVehiculos)
+                                    {
+                                        Console.WriteLine("Vehículos del cliente:");
+                                    }
+                                    tieneVehiculos = true;
+                                    Console.WriteLine($"Marca: {infoVehiculos[i, 0]}, Modelo: {infoVehiculos[i, 1]}, Placa: {infoVehiculos[i, 2]}, Año: {infoVehiculos[i, 3]}");
+                                }
+                            }
+                            if (!tieneVehiculos)
+                            {
+                                Console.WriteLine("No se encontraron vehículos para este cliente.");
+                            }
+                        }
+                        break;
+
+                    default:
+                        //salir
+                        Console.Clear();
+                        break;
+                }
+
+            } while (opcionVehiculos != 6);
+
+            return infoVehiculos;
         }
     }
 }
