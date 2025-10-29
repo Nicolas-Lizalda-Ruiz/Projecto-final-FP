@@ -302,36 +302,84 @@ namespace Projecto_final_FP_1_
             }
         }
 
-        static string[,] AsignarInfoExterior(string[,] infoDeVehiculos, string[,] infoDeClientes, int desdeDonde)
+        static void MostrarMatrizAsignada(string[,] matrizElegida)
         {
-            //int eleccionInfo = 0;
-
-            //if (desdeDonde == 2)
-            //{
-            //    MostrarMatriz(infoDeClientes);
-            //    if (desdeDonde == 1)
-            //    {
-            //        Console.Write("Elige la fila de la informacion que deseas editar o borrar: ");
-            //        eleccionInfo = int.Parse(Console.ReadLine());
-            //        while (eleccionInfo > (matrizOriginal.GetLength(0) - 1) || eleccionInfo < 1) //Verifica si se puso un rango correcto
-            //        {
-            //            Console.WriteLine();
-            //            Console.Write($"Elige en un rango de 1 a {matrizOriginal.GetLength(0) - 1}");
-            //            eleccionInfo = int.Parse(Console.ReadLine());
-            //        }
-
-            //    }
-            if (desdeDonde == 2)
+            if(matrizElegida.GetLength(0) > 1)
             {
-                return infoDeVehiculos;
+                for (int i = 0; i < matrizElegida.GetLength(0); i++)
+                {
+                    if (i != 0)
+                    {
+                        Console.Write(i + ". ");
+                    }
+                    for (int j = 0; j < matrizElegida.GetLength(1); j++)
+                    {
+                        if (i == 0)
+                        {
+                            Console.Write($"|      {matrizElegida[i, j]}      |");
+                        }
+                        else
+                        {
+                            Console.Write($"|       {matrizElegida[i, j]}         |");
+                        }
+
+                    }
+                    Console.WriteLine();
+                }
             }
-            return null;
+            else
+            {
+                Console.WriteLine("No hay nada registrado");
+            }
+        }
+
+        static string[,] AsignarInfoExterior(string[,] infoPadre, string[,] infoHijo, string[,] infoAsignada, int desdeDonde)
+        {
+            string[,] infoAsignadaOriginal = infoAsignada;
+            infoAsignada = new string[infoAsignada.GetLength(0) + 1, infoAsignada.GetLength(1)];
+            int eleccionFila1 = 0;
+            int eleccionFila2 = 0;
+
+            if (infoPadre.GetLength(0) < 2 || infoPadre.GetLength(0) < 2)
+            {
+                if (desdeDonde == 2)
+                {
+                    MostrarMatriz(infoPadre);
+                    Console.WriteLine();
+                    Console.Write("Elige la fila del cliente al que le quieres asignar un vehículo: ");
+                    eleccionFila1 = int.Parse(Console.ReadLine());
+
+                    Console.Clear();
+
+                    MostrarMatriz(infoHijo);
+                    Console.WriteLine();
+                    Console.Write("Elige el vehículo a asignar: ");
+                    eleccionFila2 = int.Parse(Console.ReadLine());
+
+                    for (int i = 0; i < infoAsignadaOriginal.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < infoAsignadaOriginal.GetLength(1); j++)
+                        {
+                            infoAsignada[i, j] = infoAsignadaOriginal[i, j];
+                        }
+                    }
+
+                    //infoAsignada
+                }
+            }
+            else
+            {
+                Console.WriteLine("Hay registracion inexistente en uno de los tipos de informacion. Registra todo primero.");
+                Console.WriteLine("");
+            }
+                return infoAsignada;
         }
 
         static string[,] GestionDeVehiculos(string[,] infoVehiculos, string[,] infoClientes)
         {
             int desdeVehículos = 2;
             int opcionVehiculos = 0;
+            string[,] infoAsignadaVehiculosAClientes = new string[1, 4];
 
             do
             {
