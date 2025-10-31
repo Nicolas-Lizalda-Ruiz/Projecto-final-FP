@@ -111,7 +111,8 @@ namespace Projecto_final_FP_1_
                 switch (opcionClientes)
                 {
                     case 1:
-                        if(informacionDeClientes_1.GetLength(0) > 16) //la primera fila no cuenta, por eso es 16
+                        Console.Clear();
+                        if (informacionDeClientes_1.GetLength(0) > 16) //la primera fila no cuenta, por eso es 16
                         {
                             Console.WriteLine("Se ha llegado al a máxima cantidad de clientes, lo cual es 15.");
                         }
@@ -124,13 +125,14 @@ namespace Projecto_final_FP_1_
 
                     case 2:
                         Console.Clear();
-                        MostrarMatriz(informacionDeClientes_1);
+                        MostrarMatriz(informacionDeClientes_1, desdeClientes);
                         //GestionDeVehiculos();
                         break;
 
                     case 3:
                         Console.Clear();
                         informacionDeClientes_1 = LogicaEditarInfo(informacionDeClientes_1, informacionDeClientes_1, desdeClientes);
+                        Console.Clear();
                         break;
 
                     default:
@@ -140,6 +142,79 @@ namespace Projecto_final_FP_1_
             } while (opcionClientes != 4);
 
             return informacionDeClientes_1;
+        }
+
+        static string[,] GestionDeVehiculos(string[,] infoVehiculos, string[,] infoClientes)
+        {
+            int desdeVehículos = 2;
+            int opcionVehiculos = 0;
+
+            do
+            {
+                Console.WriteLine("Digita el numero de la opción para elegirla.");
+                Console.WriteLine("1. Registrar un nuevo vehículo.");
+                Console.WriteLine("2. Ver lista de vehículos registrados.");
+                Console.WriteLine("3. Editar información de un vehículo.");
+                Console.WriteLine("4. Asignar vehículo a un cliente.");
+                Console.WriteLine("5. Ver vehículos de un cliente específico.");
+                Console.WriteLine("6. Salir de Gestión de vehículos.");
+                Console.WriteLine();
+                Console.Write("Elige: ");
+                opcionVehiculos = int.Parse(Console.ReadLine());
+
+                if (opcionVehiculos < 1 || opcionVehiculos > 6)
+                {
+                    do
+                    {
+                        Console.Write("Opción no válida. Por favor, elige una opción entre 1 y 6: ");
+                        opcionVehiculos = Convert.ToInt32(Console.ReadLine());
+                    } while (opcionVehiculos < 1 || opcionVehiculos > 6);
+                }
+
+                switch (opcionVehiculos)
+                {
+                    case 1:
+                        Console.Clear();
+                        infoVehiculos = LogicaNuevaInfo(infoVehiculos, infoVehiculos);
+                        Console.Clear();
+                        break;
+
+                    case 2:
+                        //mostrar lista de vehículos
+                        Console.Clear();
+                        MostrarMatriz(infoVehiculos, desdeVehículos);
+                        Console.WriteLine();
+                        break;
+
+                    case 3:
+                        Console.Clear();
+                        MostrarMatriz(infoVehiculos, desdeVehículos);
+                        infoVehiculos = LogicaEditarInfo(infoVehiculos, infoVehiculos, desdeVehículos);
+                        Console.Clear();
+                        break;
+
+                    case 4:
+                        Console.Clear();
+                        infoVehiculos = AsignarInfoVehículos(infoClientes, infoVehiculos, desdeVehículos);
+                        break;
+
+
+                    case 5: //incompleto
+                        Console.Clear();
+                        MostrarVehiculosDeUnClienteEspecifico(infoVehiculos,infoClientes);
+                        Console.Clear();
+                        MostrarMatriz(infoVehiculos, 1);
+                        break;
+
+                    case 6:
+                        //salir
+                        Console.Clear();
+                        break;
+                }
+
+            } while (opcionVehiculos != 6);
+
+            return infoVehiculos;
         }
 
         static string[,] LogicaNuevaInfo(string[,] matrizOriginal, string[,] matrizDada)
@@ -167,14 +242,14 @@ namespace Projecto_final_FP_1_
             int eleccionInfo = 0;
             int opcion = 0;
             Console.Clear();
-            MostrarMatriz(matrizDada);
+            MostrarMatriz(matrizDada, desdeDonde);
             Console.WriteLine();//separa las lineas en consola para que sean mas legible
 
             if(matrizDada.GetLength(0) > 1) //revisa en primer plano si hay informacion editable
             {
                 if(desdeDonde == 1)
                 {
-                    Console.Write("Elige la fila de la informacion que deseas editar o borrar: ");
+                    Console.Write("Elige la fila de la informacion que deseas editar o borrar. Digita el numero de fila: ");
                     eleccionInfo = int.Parse(Console.ReadLine());
                     while (eleccionInfo > (matrizOriginal.GetLength(0) - 1) || eleccionInfo < 1) //Verifica si se puso un rango correcto
                     {
@@ -210,7 +285,7 @@ namespace Projecto_final_FP_1_
                 {
                     Console.WriteLine();
                     Console.Write($"Elige 1 o 2: ");
-                    eleccionInfo = int.Parse(Console.ReadLine());
+                    opcion = int.Parse(Console.ReadLine());
                 }
 
                 Console.WriteLine();//separa las lineas en consola para que sean mas legibles
@@ -264,16 +339,17 @@ namespace Projecto_final_FP_1_
             }
             else
             {
-                Console.WriteLine("No hay informacion para editar");
+                Console.WriteLine("No hay informacion registrada para editar, registra algo primero");
             }
 
             Console.Clear();
             return matrizDada;
         }
 
-        static void MostrarMatriz(string[,] matrizElegida)
+        static void MostrarMatriz(string[,] matrizElegida, int desdeDonde)
         {
-            if(matrizElegida.GetLength(0) > 1)
+
+            if(matrizElegida.GetLength(0) > 1 && desdeDonde != 2)
             {
                 for (int i = 0; i < matrizElegida.GetLength(0); i++)
                 {
@@ -295,150 +371,177 @@ namespace Projecto_final_FP_1_
                     }
                     Console.WriteLine();
                 }
-            }
-            else
-            {
-                Console.WriteLine("No hay nada registrado");
-            }
-        }
-
-        static void MostrarMatrizAsignada(string[,] matrizElegida)
-        {
-            if(matrizElegida.GetLength(0) > 1)
-            {
-                for (int i = 0; i < matrizElegida.GetLength(0); i++)
-                {
-                    if (i != 0)
-                    {
-                        Console.Write(i + ". ");
-                    }
-                    for (int j = 0; j < matrizElegida.GetLength(1); j++)
-                    {
-                        if (i == 0)
-                        {
-                            Console.Write($"|      {matrizElegida[i, j]}      |");
-                        }
-                        else
-                        {
-                            Console.Write($"|       {matrizElegida[i, j]}         |");
-                        }
-
-                    }
-                    Console.WriteLine();
-                }
-            }
-            else
-            {
-                Console.WriteLine("No hay nada registrado");
-            }
-        }
-
-        static string[,] AsignarInfoExterior(string[,] infoPadre, string[,] infoHijo, string[,] infoAsignada, int desdeDonde)
-        {
-            string[,] infoAsignadaOriginal = infoAsignada;
-            infoAsignada = new string[infoAsignada.GetLength(0) + 1, infoAsignada.GetLength(1)];
-            int eleccionFila1 = 0;
-            int eleccionFila2 = 0;
-
-            if (infoPadre.GetLength(0) < 2 || infoPadre.GetLength(0) < 2)
-            {
-                if (desdeDonde == 2)
-                {
-                    MostrarMatriz(infoPadre);
-                    Console.WriteLine();
-                    Console.Write("Elige la fila del cliente al que le quieres asignar un vehículo: ");
-                    eleccionFila1 = int.Parse(Console.ReadLine());
-
-                    Console.Clear();
-
-                    MostrarMatriz(infoHijo);
-                    Console.WriteLine();
-                    Console.Write("Elige el vehículo a asignar: ");
-                    eleccionFila2 = int.Parse(Console.ReadLine());
-
-                    for (int i = 0; i < infoAsignadaOriginal.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < infoAsignadaOriginal.GetLength(1); j++)
-                        {
-                            infoAsignada[i, j] = infoAsignadaOriginal[i, j];
-                        }
-                    }
-
-                    //infoAsignada
-                }
-            }
-            else
-            {
-                Console.WriteLine("Hay registracion inexistente en uno de los tipos de informacion. Registra todo primero.");
-                Console.WriteLine("");
-            }
-                return infoAsignada;
-        }
-
-        static string[,] GestionDeVehiculos(string[,] infoVehiculos, string[,] infoClientes)
-        {
-            int desdeVehículos = 2;
-            int opcionVehiculos = 0;
-            string[,] infoAsignadaVehiculosAClientes = new string[1, 4];
-
-            do
-            {
-                Console.WriteLine("Digita el numero de la opción para elegirla.");
-                Console.WriteLine("1. Registrar un nuevo vehículo.");
-                Console.WriteLine("2. Ver lista de vehículos registrados.");
-                Console.WriteLine("3. Editar información de un vehículo.");
-                Console.WriteLine("4. Asignar vehículo a un cliente.");
-                Console.WriteLine("5. Ver vehículos de un cliente específico.");
-                Console.WriteLine("6. Salir de Gestión de vehículos.");
                 Console.WriteLine();
-                Console.Write("Elige: ");
-                opcionVehiculos = int.Parse(Console.ReadLine());
-
-                if (opcionVehiculos < 1 || opcionVehiculos > 6)
+            }
+            else if(matrizElegida.GetLength(0) > 1 && desdeDonde == 2)
+            {
+                for (int i = 0; i < matrizElegida.GetLength(0); i++)
                 {
-                    do
+                    if (i != 0)
                     {
-                        Console.Write("Opción no válida. Por favor, elige una opción entre 1 y 6: ");
-                        opcionVehiculos = Convert.ToInt32(Console.ReadLine());
-                    } while (opcionVehiculos < 1 || opcionVehiculos > 6);
-                }
+                        Console.Write(i + ". ");
+                    }
 
-                switch (opcionVehiculos)
+                    if(matrizElegida.GetLength(1) > 4)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            if (i == 0)
+                            {
+                                Console.Write($"|      {matrizElegida[i, j]}      |");
+                            }
+                            else
+                            {
+                                Console.Write($"|       {matrizElegida[i, j]}         |");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < matrizElegida.GetLength(1); j++)
+                        {
+                            if (i == 0)
+                            {
+                                Console.Write($"|      {matrizElegida[i, j]}      |");
+                            }
+                            else
+                            {
+                                Console.Write($"|       {matrizElegida[i, j]}         |");
+                            }
+                        }
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("No hay nada registrado o asignado");
+                Console.WriteLine();
+            }
+        }
+
+        static string[,] AsignarInfoVehículos(string[,] InfoClientes, string[,] infoVehiculos, int desdeDonde)
+        {
+            string[,] infoVehiculosOriginal = infoVehiculos;
+            int eleccionFilaClientes = 0;
+            int eleccionFilaVehiculos = 0;
+            bool yaAsignado = false;
+
+            if (InfoClientes.GetLength(0) > 2 && infoVehiculos.GetLength(0) > 2) //si hay registrados en primer plano
+            {
+                if (infoVehiculos.GetLength(1) == 4) //Al comienzo, extiende la matriz en secreto cuando se llama este codigo por primera vez
                 {
-                    case 1:
-                        infoVehiculos = LogicaNuevaInfo(infoVehiculos, infoVehiculos);
-                        Console.Clear();
-                        break;
-
-                    case 2:
-                        //mostrar lista de vehículos
-                        Console.Clear();
-                        MostrarMatriz(infoVehiculos);
-                        Console.WriteLine();
-                        break;
-
-                    case 3:
-                        MostrarMatriz(infoVehiculos);
-                        infoVehiculos = LogicaEditarInfo(infoVehiculos, infoVehiculos, desdeVehículos);
-                        Console.Clear();
-                        break;
-
-                    case 4:
-                        break;
-
-                    case 5:
-                        //ver vehículos de un cliente específico
-                        break;
-
-                    case 6:
-                        //salir
-                        Console.Clear();
-                        break;
+                    infoVehiculos = new string[infoVehiculos.GetLength(0), infoVehiculos.GetLength(1)+1];
+                    for (int i = 0; i < infoVehiculos.GetLength(0); i++)
+                    {
+                        infoVehiculos = RellenarMatrizDeColumnaExtra(infoVehiculosOriginal, infoVehiculos);
+                    }
                 }
 
-            } while (opcionVehiculos != 6);
+                MostrarMatriz(InfoClientes, desdeDonde); //elegir el cliente
+                Console.WriteLine();
+                Console.Write("Digita el numero de fila del cliente que quieres asignarle un vehiculo: ");
+                eleccionFilaClientes = int.Parse(Console.ReadLine());
+                while(eleccionFilaClientes > InfoClientes.GetLength(0) - 1 || eleccionFilaClientes < 1)//revisa si la eleccion esta en el rango
+                {
+                    Console.WriteLine();
+                    Console.Write($"Eleccion invalida, porfavor elige un rango entre 1 y {InfoClientes.GetLength(0)-1}: ");
+                    eleccionFilaClientes = int.Parse(Console.ReadLine());
+                }
 
+                Console.Clear();
+
+                MostrarMatriz(infoVehiculos, desdeDonde); //eligir el vehiculo
+                Console.WriteLine();
+                Console.WriteLine($"Estas asignando un vehiculo al cliente: {InfoClientes[eleccionFilaClientes, 0]} | {InfoClientes[eleccionFilaClientes, 1]} | {InfoClientes[eleccionFilaClientes, 2]}");
+                Console.Write("Digita el numero de fila del vehiculo que quieres asignar: ");
+                eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                while (eleccionFilaVehiculos > infoVehiculos.GetLength(0) - 1 || eleccionFilaVehiculos < 1)//revisa si la eleccion esta en el rango
+                {
+                    Console.WriteLine();
+                    Console.Write($"Eleccion invalida, porfavor elige un rango entre 1 y {infoVehiculos.GetLength(0) - 1}: ");
+                    eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                }
+
+                for (int j = 0; j < infoVehiculos.GetLength(1); j++) //revisa antes si al cliente se le intenta asignar el mismo vehiculo
+                {
+                    if (infoVehiculos[eleccionFilaVehiculos, j] == InfoClientes[eleccionFilaClientes, 1])
+                    {
+                        while (infoVehiculos[eleccionFilaVehiculos, j] == InfoClientes[eleccionFilaClientes, 1])
+                        {
+                            Console.WriteLine();
+                            Console.Write("Le intentas asignar el mismo vehiculo a un cliente que ya lo tiene. Elige otro vehiculo digitando su numero de fila: ");
+                            eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                        }
+                    }
+                }
+
+                if (infoVehiculos[eleccionFilaVehiculos, infoVehiculos.GetLength(1) - 1] != null) //si ya existe un cliente en la ultima columna, crea otra
+                {
+                    infoVehiculos = new string[infoVehiculos.GetLength(0), infoVehiculos.GetLength(1) + 1];
+                    infoVehiculos = RellenarMatrizDeColumnaExtra(infoVehiculosOriginal, infoVehiculos);
+
+                    infoVehiculos[eleccionFilaVehiculos, infoVehiculos.GetLength(1) - 1] = InfoClientes[eleccionFilaClientes, 1];
+
+                    yaAsignado = true;
+                }
+
+                if (yaAsignado == false)//Este cuenta hasta que se encuentre con un espacio nulo, si no se extiendio la matriz en el for loop anterior (por eso esta yaAsignado == true que se revisa acá). Cuando encuentre un espacio vacio en la fila. asigna la cedula ahí.
+                {
+                    for (int j = 0; j < infoVehiculos.GetLength(1); j++)//Cuando ya se revise que al cliente no se le asigna el mismo vehículo. Se mete en un diferente espacio en blanco otro cliente            
+                    {
+                        if (infoVehiculos[eleccionFilaVehiculos, j] == null)
+                        {
+                            infoVehiculos[eleccionFilaVehiculos, j] = InfoClientes[eleccionFilaClientes, 1];
+                            j = infoVehiculos.GetLength(1) - 1; //Lleva el numero de ciclo al maximo para que no siga llenado los otros espacios vacios
+
+                        }
+                    }
+                }
+            }
+            else // si no hay nada registrado, hecha este mensaje y no pasa nada
+            {
+                Console.WriteLine("Hay registracion inexistente en uno de los tipos de informacion. Debe haber al menos un cliente y un vehiculo registrados.");
+                Console.WriteLine();
+            }
+
+            Console.Clear();
             return infoVehiculos;
+        }
+
+        static string[,] RellenarMatrizDeColumnaExtra(string[,] matrizOriginal, string[,] matrizDada)
+        {
+            for (int i = 0; i < matrizDada.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrizDada.GetLength(1); j++)
+                {
+                    if(j < matrizDada.GetLength(1) - 1)
+                    {
+                        matrizDada[i, j] = matrizOriginal[i, j];
+                    }
+                }
+            }
+            return matrizDada;
+        }
+
+        static void MostrarVehiculosDeUnClienteEspecifico(string[,] infoDeVehiculos, string[,] infoDeClientes) //incompleto
+        {
+            string[,] matrizAMostrar = new string[0, 0];
+            int eleccionFilaClientes = 0;
+
+            MostrarMatriz(infoDeClientes, 1); //Aqui se elige el cliente del que se quiere ver sus vehiclos
+            Console.WriteLine("Digita el numero de fila del cliente del que quieres ver sus vehiculos: ");
+            eleccionFilaClientes = int.Parse(Console.ReadLine());
+
+            Console.WriteLine($"El cliente {infoDeClientes[eleccionFilaClientes, 0]} | {infoDeClientes[eleccionFilaClientes, 1]} | {infoDeClientes[eleccionFilaClientes, 2]} tiene asignado los siguientes vehículos: ");
+
+            for (int i = 0; i < infoDeVehiculos.GetLength(0); i++)
+            {
+                for (int j = 0; j < infoDeVehiculos.GetLength(1); j++)
+                {
+                }
+            }
         }
     }
 }
