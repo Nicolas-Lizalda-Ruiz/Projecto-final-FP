@@ -202,8 +202,6 @@ namespace Projecto_final_FP_1_
                     case 5: //incompleto
                         Console.Clear();
                         MostrarVehiculosDeUnClienteEspecifico(infoVehiculos,infoClientes);
-                        Console.Clear();
-                        MostrarMatriz(infoVehiculos, 1);
                         break;
 
                     case 6:
@@ -496,6 +494,7 @@ namespace Projecto_final_FP_1_
                             infoVehiculos[eleccionFilaVehiculos, j] = InfoClientes[eleccionFilaClientes, 1];
                             j = infoVehiculos.GetLength(1) - 1; //Lleva el numero de ciclo al maximo para que no siga llenado los otros espacios vacios
 
+
                         }
                     }
                 }
@@ -536,10 +535,39 @@ namespace Projecto_final_FP_1_
 
             Console.WriteLine($"El cliente {infoDeClientes[eleccionFilaClientes, 0]} | {infoDeClientes[eleccionFilaClientes, 1]} | {infoDeClientes[eleccionFilaClientes, 2]} tiene asignado los siguientes vehículos: ");
 
-            for (int i = 0; i < infoDeVehiculos.GetLength(0); i++)
+            if(infoDeVehiculos.GetLength(1) < 5) //si no hay asignacion en primer plano. tira este mensaje
             {
-                for (int j = 0; j < infoDeVehiculos.GetLength(1); j++)
+                Console.WriteLine("Ningun cliente tiene vehiculo asignado");
+            }
+            else if (infoDeClientes.GetLength(0) < 2)
+            {
+                Console.WriteLine("No hay ningun cliente registrado");
+            }
+            else if(infoDeVehiculos.GetLength(0) < 2)
+            {
+                Console.WriteLine("Ningun vehiculo registrado");
+            }
+            else
+            {
+                for (int i = 0; i < infoDeVehiculos.GetLength(1); i++) //Muestra los titulos de la matriz de vehiculos
                 {
+                    if (i > 3)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine($"//------{infoDeVehiculos[0, i]}------//");
+                    }
+                }
+
+                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //cuando encuentre una fila con la cedula de cliente que coincidente, imprime solamente las primeras 4 columnas
+                {
+                    for (int j = 0; j < infoDeVehiculos.GetLength(1); j++)
+                    {
+                        if (infoDeVehiculos[i, j] == infoDeClientes[eleccionFilaClientes, 2])
+                        {
+
+                            Console.WriteLine($"|   {infoDeVehiculos[i, 0]}   ||   {infoDeVehiculos[i, 1]}   ||   {infoDeVehiculos[i, 2]}   ||   {infoDeVehiculos[i, 3]}   |");
+                        }
+                    }
                 }
             }
         }
