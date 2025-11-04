@@ -118,7 +118,7 @@ namespace Projecto_final_FP_1_
                         }
                         else
                         {
-                            informacionDeClientes_1 = LogicaNuevaInfo(informacionDeClientes_1, informacionDeClientes_1);
+                            informacionDeClientes_1 = LogicaNuevaInfo(informacionDeClientes_1, informacionDeClientes_1, desdeClientes);
                         }
                         Console.Clear();
                         break;
@@ -175,7 +175,7 @@ namespace Projecto_final_FP_1_
                 {
                     case 1:
                         Console.Clear();
-                        infoVehiculos = LogicaNuevaInfo(infoVehiculos, infoVehiculos);
+                        infoVehiculos = LogicaNuevaInfo(infoVehiculos, infoVehiculos, desdeVehículos);
                         Console.Clear();
                         break;
 
@@ -215,7 +215,7 @@ namespace Projecto_final_FP_1_
             return infoVehiculos;
         }
 
-        static string[,] LogicaNuevaInfo(string[,] matrizOriginal, string[,] matrizDada)
+        static string[,] LogicaNuevaInfo(string[,] matrizOriginal, string[,] matrizDada, int desdeDonde)
         {
             matrizDada = new string[matrizOriginal.GetLength(0) + 1, matrizOriginal.GetLength(1)];
 
@@ -227,10 +227,21 @@ namespace Projecto_final_FP_1_
                 }
             }
 
-            for (int i = 0; i < matrizDada.GetLength(1); i++)
+            if(desdeDonde == 1)
             {
-                Console.Write($"Ingresa la nueva información en {matrizDada[0, i]}: ");
-                matrizDada[matrizDada.GetLength(0) - 1, i] = Console.ReadLine();
+                for (int j = 0; j < matrizDada.GetLength(1); j++)
+                {
+                    Console.Write($"Ingresa la nueva información en {matrizDada[0, j]}: ");
+                    matrizDada[matrizDada.GetLength(0) - 1, j] = Console.ReadLine();
+                }
+            }
+            else if (desdeDonde == 2)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    Console.Write($"Ingresa la nueva información en {matrizDada[0, j]}: ");
+                    matrizDada[matrizDada.GetLength(0) - 1, j] = Console.ReadLine();
+                }
             }
             return matrizDada;
         }
@@ -357,15 +368,7 @@ namespace Projecto_final_FP_1_
                     }
                     for (int j = 0; j < matrizElegida.GetLength(1); j++)
                     {
-                        if (i == 0)
-                        {
-                            Console.Write($"|      {matrizElegida[i, j]}      |");
-                        }
-                        else
-                        {
-                            Console.Write($"|       {matrizElegida[i, j]}         |");
-                        }
-
+                        Console.Write($"|      {matrizElegida[i, j]}      |");
                     }
                     Console.WriteLine();
                 }
@@ -382,15 +385,22 @@ namespace Projecto_final_FP_1_
 
                     if(matrizElegida.GetLength(1) > 4)
                     {
-                        for (int j = 0; j < 4; j++)
+                        for (int j = 0; j < 5; j++)
                         {
-                            if (i == 0)
+                            if(j < 4)
                             {
                                 Console.Write($"|      {matrizElegida[i, j]}      |");
                             }
-                            else
+                            else if (j == 4 && i > 0)
                             {
-                                Console.Write($"|       {matrizElegida[i, j]}         |");
+                                if (matrizElegida[i, 4] == null)
+                                {
+                                    Console.Write("||| No asignado");
+                                }
+                                else if (matrizElegida[i, 4] != null)
+                                {
+                                    Console.Write("||| Asignado");
+                                }
                             }
                         }
                     }
@@ -398,14 +408,7 @@ namespace Projecto_final_FP_1_
                     {
                         for (int j = 0; j < matrizElegida.GetLength(1); j++)
                         {
-                            if (i == 0)
-                            {
-                                Console.Write($"|      {matrizElegida[i, j]}      |");
-                            }
-                            else
-                            {
-                                Console.Write($"|       {matrizElegida[i, j]}         |");
-                            }
+                            Console.Write($"|      {matrizElegida[i, j]}      |");
                         }
                     }
                     Console.WriteLine();
@@ -425,8 +428,10 @@ namespace Projecto_final_FP_1_
             int eleccionFilaClientes = 0;
             int eleccionFilaVehiculos = 0;
             bool yaAsignado = false;
+            bool todosEspaciosLLenos = true;
+            bool borrarConsola = true;
 
-            if (InfoClientes.GetLength(0) > 2 && infoVehiculos.GetLength(0) > 2) //si hay registrados en primer plano
+            if (InfoClientes.GetLength(0) > 1 && infoVehiculos.GetLength(0) > 1) //si hay registrados en primer plano
             {
                 if (infoVehiculos.GetLength(1) == 4) //Al comienzo, extiende la matriz en secreto cuando se llama este codigo por primera vez
                 {
@@ -437,75 +442,78 @@ namespace Projecto_final_FP_1_
                     }
                 }
 
-                MostrarMatriz(InfoClientes, desdeDonde); //elegir el cliente
-                Console.WriteLine();
-                Console.Write("Digita el numero de fila del cliente que quieres asignarle un vehiculo: ");
-                eleccionFilaClientes = int.Parse(Console.ReadLine());
-                while(eleccionFilaClientes > InfoClientes.GetLength(0) - 1 || eleccionFilaClientes < 1)//revisa si la eleccion esta en el rango
+                for (int i = 0; i < infoVehiculos.GetLength(0); i++)//revisa si en primer plano hay almenos un espacio de asignacion
                 {
-                    Console.WriteLine();
-                    Console.Write($"Eleccion invalida, porfavor elige un rango entre 1 y {InfoClientes.GetLength(0)-1}: ");
-                    eleccionFilaClientes = int.Parse(Console.ReadLine());
-                }
-
-                Console.Clear();
-
-                MostrarMatriz(infoVehiculos, desdeDonde); //eligir el vehiculo
-                Console.WriteLine();
-                Console.WriteLine($"Estas asignando un vehiculo al cliente: {InfoClientes[eleccionFilaClientes, 0]} | {InfoClientes[eleccionFilaClientes, 1]} | {InfoClientes[eleccionFilaClientes, 2]}");
-                Console.Write("Digita el numero de fila del vehiculo que quieres asignar: ");
-                eleccionFilaVehiculos = int.Parse(Console.ReadLine());
-                while (eleccionFilaVehiculos > infoVehiculos.GetLength(0) - 1 || eleccionFilaVehiculos < 1)//revisa si la eleccion esta en el rango
-                {
-                    Console.WriteLine();
-                    Console.Write($"Eleccion invalida, porfavor elige un rango entre 1 y {infoVehiculos.GetLength(0) - 1}: ");
-                    eleccionFilaVehiculos = int.Parse(Console.ReadLine());
-                }
-
-                for (int j = 0; j < infoVehiculos.GetLength(1); j++) //revisa antes si al cliente se le intenta asignar el mismo vehiculo
-                {
-                    if (infoVehiculos[eleccionFilaVehiculos, j] == InfoClientes[eleccionFilaClientes, 1])
+                    if (infoVehiculos[i, 4] == null && i != 0)
                     {
-                        while (infoVehiculos[eleccionFilaVehiculos, j] == InfoClientes[eleccionFilaClientes, 1])
+                        todosEspaciosLLenos = false;
+                        i = infoVehiculos.GetLength(1) - 1; //para que salga del ciclo
+                    }
+                }
+
+                if(todosEspaciosLLenos == false)
+                {
+                    MostrarMatriz(InfoClientes, desdeDonde); //elegir el cliente
+                    Console.WriteLine();
+                    Console.Write("Digita el numero de fila del cliente que quieres asignarle un vehiculo: ");
+                    eleccionFilaClientes = int.Parse(Console.ReadLine());
+                    while (eleccionFilaClientes > InfoClientes.GetLength(0) - 1 || eleccionFilaClientes < 1)//revisa si la eleccion esta en el rango
+                    {
+                        Console.WriteLine();
+                        Console.Write($"Eleccion invalida, porfavor elige un rango entre 1 y {InfoClientes.GetLength(0) - 1}: ");
+                        eleccionFilaClientes = int.Parse(Console.ReadLine());
+                    }
+
+                    Console.Clear();
+
+                    MostrarMatriz(infoVehiculos, desdeDonde); //eligir el vehiculo
+                    Console.WriteLine();
+                    Console.WriteLine($"Estas asignando un vehiculo al cliente: {InfoClientes[eleccionFilaClientes, 0]} | {InfoClientes[eleccionFilaClientes, 1]} | {InfoClientes[eleccionFilaClientes, 2]}");
+                    Console.Write("Digita el numero de fila del vehiculo que quieres asignar: ");
+                    eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                    while (eleccionFilaVehiculos > infoVehiculos.GetLength(0) - 1 || eleccionFilaVehiculos < 1)//revisa si la eleccion esta en el rango
+                    {
+                        Console.WriteLine();
+                        Console.Write($"Eleccion invalida, porfavor elige un rango entre 1 y {infoVehiculos.GetLength(0) - 1}: ");
+                        eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                    }
+
+                    if (infoVehiculos[eleccionFilaVehiculos, 4] != null)//revisa si el vehiculo elegido ya tiene un cliente asignado
+                    {
+                        while (infoVehiculos[eleccionFilaVehiculos, 4] != null)
                         {
                             Console.WriteLine();
-                            Console.Write("Le intentas asignar el mismo vehiculo a un cliente que ya lo tiene. Elige otro vehiculo digitando su numero de fila: ");
+                            Console.Write("Le intentas asignar a este cliente un vehiculo que ya tiene un cliente asignado. Elige otro vegiculo: ");
                             eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                            while (eleccionFilaVehiculos < 1 || eleccionFilaVehiculos > infoVehiculos.GetLength(0) - 1)
+                            {
+                                Console.Write("Elige un rango valido porfavor: ");
+                                eleccionFilaVehiculos = int.Parse(Console.ReadLine());
+                            }
                         }
                     }
+
+                    //Cuando ya se revise que al cliente no se le asigna el mismo vehículo. Se mete en el espacio en blanco de la matriz de la fila del vehiculo elegido en la última columna.           
+                    infoVehiculos[eleccionFilaVehiculos, 4] = InfoClientes[eleccionFilaClientes, 1];
                 }
-
-                if (infoVehiculos[eleccionFilaVehiculos, infoVehiculos.GetLength(1) - 1] != null) //si ya existe un cliente en la ultima columna, crea otra
+                else if (todosEspaciosLLenos == true)
                 {
-                    infoVehiculos = new string[infoVehiculos.GetLength(0), infoVehiculos.GetLength(1) + 1];
-                    infoVehiculos = RellenarMatrizDeColumnaExtra(infoVehiculosOriginal, infoVehiculos);
-
-                    infoVehiculos[eleccionFilaVehiculos, infoVehiculos.GetLength(1) - 1] = InfoClientes[eleccionFilaClientes, 1];
-
-                    yaAsignado = true;
-                }
-
-                if (yaAsignado == false)//Este cuenta hasta que se encuentre con un espacio nulo, si no se extiendio la matriz en el for loop anterior (por eso esta yaAsignado == true que se revisa acá). Cuando encuentre un espacio vacio en la fila. asigna la cedula ahí.
-                {
-                    for (int j = 0; j < infoVehiculos.GetLength(1); j++)//Cuando ya se revise que al cliente no se le asigna el mismo vehículo. Se mete en un diferente espacio en blanco otro cliente            
-                    {
-                        if (infoVehiculos[eleccionFilaVehiculos, j] == null)
-                        {
-                            infoVehiculos[eleccionFilaVehiculos, j] = InfoClientes[eleccionFilaClientes, 1];
-                            j = infoVehiculos.GetLength(1) - 1; //Lleva el numero de ciclo al maximo para que no siga llenado los otros espacios vacios
-
-
-                        }
-                    }
+                    Console.Clear();
+                    Console.WriteLine("Ya todos los vehiculos estan asignados. Todavia puedes registrar nuevos vehiculos");
+                    borrarConsola = false;
                 }
             }
             else // si no hay nada registrado, hecha este mensaje y no pasa nada
             {
                 Console.WriteLine("Hay registracion inexistente en uno de los tipos de informacion. Debe haber al menos un cliente y un vehiculo registrados.");
                 Console.WriteLine();
+                borrarConsola = false;
             }
 
-            Console.Clear();
+            if(borrarConsola == true)
+            {
+                Console.Clear();
+            }
             return infoVehiculos;
         }
 
@@ -526,39 +534,72 @@ namespace Projecto_final_FP_1_
 
         static void MostrarVehiculosDeUnClienteEspecifico(string[,] infoDeVehiculos, string[,] infoDeClientes) //incompleto
         {
-            string[,] matrizAMostrar = new string[0, 0];
             int eleccionFilaClientes = 0;
+            bool existenCosas = true;
 
-            MostrarMatriz(infoDeClientes, 1); //Aqui se elige el cliente del que se quiere ver sus vehiclos
-            Console.WriteLine("Digita el numero de fila del cliente del que quieres ver sus vehiculos: ");
-            eleccionFilaClientes = int.Parse(Console.ReadLine());
-
-            Console.WriteLine($"El cliente {infoDeClientes[eleccionFilaClientes, 0]} | {infoDeClientes[eleccionFilaClientes, 1]} | {infoDeClientes[eleccionFilaClientes, 2]} tiene asignado los siguientes vehículos: ");
-
-            if(infoDeVehiculos.GetLength(1) < 5) //si no hay asignacion en primer plano. tira este mensaje
+            //si falta informacion en primer plano. tira estos mensajes dependiendo de lo que falta
+            if (infoDeVehiculos.GetLength(1) < 5) 
             {
                 Console.WriteLine("Ningun cliente tiene vehiculo asignado");
+                existenCosas = false;
             }
-            else if (infoDeClientes.GetLength(0) < 2)
+
+            if (infoDeClientes.GetLength(0) < 2)
             {
                 Console.WriteLine("No hay ningun cliente registrado");
+                existenCosas = false;
             }
-            else if(infoDeVehiculos.GetLength(0) < 2)
+            
+            if (infoDeVehiculos.GetLength(0) < 2)
             {
-                Console.WriteLine("Ningun vehiculo registrado");
+                Console.WriteLine("No hay ningun vehiculo registrado");
+                existenCosas = false;
             }
-            else
+
+            if(existenCosas == true) //Si hay las suficentes cosas pa que funcionen bien las cosas en este modulo, realiza la muestra
             {
+                bool clienteTieneVehiculos = false;
+
+                MostrarMatriz(infoDeClientes, 1); //Aqui se elige el cliente del que se quiere ver sus vehiclos
+                Console.Write("Digita el numero de fila del cliente del que quieres ver sus vehiculos: ");
+                eleccionFilaClientes = int.Parse(Console.ReadLine());
+                while(eleccionFilaClientes < 1 || eleccionFilaClientes > infoDeClientes.GetLength(0) - 1)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Elige un rango valido porfavor: ");
+                    eleccionFilaClientes = int.Parse(Console.ReadLine());
+                }
+
+                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++)
+                {
+                    if(infoDeVehiculos[i,4] == infoDeClientes[eleccionFilaClientes,1])
+                    {
+                        clienteTieneVehiculos = true;
+                    }
+                }
+                
+                if(clienteTieneVehiculos == false)
+                {
+                    Console.WriteLine("El cliente no tiene vehículos registrados");
+                    Console.WriteLine();
+                    return;
+                }
+
+                Console.WriteLine($"El cliente {infoDeClientes[eleccionFilaClientes, 0]} | {infoDeClientes[eleccionFilaClientes, 1]} | {infoDeClientes[eleccionFilaClientes, 2]} tiene asignado los siguientes vehículos: ");
+
+                Console.WriteLine();
+
                 for (int i = 0; i < infoDeVehiculos.GetLength(1); i++) //Muestra los titulos de la matriz de vehiculos
                 {
-                    if (i > 3)
+                    if (i < 4)
                     {
-                        Console.WriteLine();
-                        Console.WriteLine($"//------{infoDeVehiculos[0, i]}------//");
+                        Console.Write(infoDeVehiculos[0, i]);//no le pongo espaciadores porque ya tiene
                     }
                 }
 
-                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //cuando encuentre una fila con la cedula de cliente que coincidente, imprime solamente las primeras 4 columnas
+                Console.WriteLine();
+
+                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //En la matriz de vehiculos que ya tiene una quitna columna secreta, cuando encuentre una fila con la cedula de cliente que coincide, imprime solamente las primeras 4 columnas
                 {
                     for (int j = 0; j < infoDeVehiculos.GetLength(1); j++)
                     {
@@ -570,6 +611,8 @@ namespace Projecto_final_FP_1_
                     }
                 }
             }
+
+            Console.WriteLine();
         }
     }
 }
