@@ -56,8 +56,16 @@ namespace Projecto_final_FP_1_
                 switch (opcion)
                 {
                     case 1:
+                        string[,] infoClientesOriginal = informacionDeClientes_0; //para actualizar los vehiculos asignados
+
                         Console.Clear();
-                        informacionDeClientes_0 = GestionDeClientes(informacionDeClientes_0);
+                        informacionDeClientes_0 = GestionDeClientes(informacionDeClientes_0, informacionVehículos_0);
+
+                        if(informacionVehículos_0.GetLength(1) > 4) //Si ya hay asignaciones
+                        {
+                            informacionVehículos_0 = ActualizarVehiculos(informacionVehículos_0, informacionDeClientes_0, infoClientesOriginal);//Se actualizan los clientes asignados si se cambiaron
+                        }
+
                         Console.WriteLine("Saliste de la gestión de clientes");
                         Console.WriteLine();
                         break;
@@ -83,10 +91,11 @@ namespace Projecto_final_FP_1_
             } while (opcion != 4);
         }
 
-        static string[,] GestionDeClientes(string[,] informacionDeClientes_1)
+        static string[,] GestionDeClientes(string[,] informacionDeClientes_1, string[,] infoDeVehiculos)
         {
             int desdeClientes = 1;
             int opcionClientes = 0;
+            bool yaCambioInfo = false;
 
             do
             {
@@ -130,9 +139,19 @@ namespace Projecto_final_FP_1_
                         break;
 
                     case 3:
-                        Console.Clear();
-                        informacionDeClientes_1 = LogicaEditarInfo(informacionDeClientes_1, informacionDeClientes_1, desdeClientes);
-                        Console.Clear();
+                        if(yaCambioInfo == false) //Como pueden haber varios cambios en la matriz que el programa no es capaz de identificar con las herramientas actuales, entonces, forzo que el usuario lo actualize manualmente.
+                        {
+                            Console.Clear();
+                            informacionDeClientes_1 = LogicaEditarInfo(informacionDeClientes_1, informacionDeClientes_1, infoDeVehiculos, desdeClientes);
+                            Console.Clear();
+                        }
+                        else if(yaCambioInfo == true)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Porfavor sal al menú principal para actualizar la informacion del cliente globalmente en el programa.");
+                        }
+                        
+                        yaCambioInfo = true;
                         break;
 
                     default:
@@ -189,7 +208,7 @@ namespace Projecto_final_FP_1_
                     case 3:
                         Console.Clear();
                         MostrarMatriz(infoVehiculos, desdeVehículos);
-                        infoVehiculos = LogicaEditarInfo(infoVehiculos, infoVehiculos, desdeVehículos);
+                        infoVehiculos = LogicaEditarInfo(infoVehiculos, infoVehiculos, infoClientes, desdeVehículos);
                         Console.Clear();
                         break;
 
@@ -246,17 +265,18 @@ namespace Projecto_final_FP_1_
             return matrizDada;
         }
 
-        static string[,] LogicaEditarInfo(string[,] matrizOriginal, string[,] matrizDada, int desdeDonde)
+        static string[,] LogicaEditarInfo(string[,] matrizOriginal, string[,] matrizDada, string[,] matrizActualizar, int desdeDonde)
         {            
             int eleccionInfo = 0;
             int opcion = 0;
-            Console.Clear();
-            MostrarMatriz(matrizDada, desdeDonde);
-            Console.WriteLine();//separa las lineas en consola para que sean mas legible
 
-            if(matrizDada.GetLength(0) > 1) //revisa en primer plano si hay informacion editable
+            if (matrizDada.GetLength(0) > 1) //revisa en primer plano si hay informacion editable
             {
-                if(desdeDonde == 1)
+                Console.Clear();
+                MostrarMatriz(matrizDada, desdeDonde);
+                Console.WriteLine("Ten en cuenta que al editar la informacion de un cliente tendrás que reasignar sus vehículos si es que no borraste el cliente.");
+
+                if (desdeDonde == 1)
                 {
                     Console.Write("Elige la fila de la informacion que deseas editar o borrar. Digita el numero de fila: ");
                     eleccionInfo = int.Parse(Console.ReadLine());
@@ -278,7 +298,7 @@ namespace Projecto_final_FP_1_
                         {
                             for (int j = 0; j < matrizDada.GetLength(1); j++)
                             {
-                                if(comparadorDePlaca == matrizDada[i, j] && i != 0)
+                                if (comparadorDePlaca == matrizDada[i, j] && i != 0)
                                 {
                                     eleccionInfo = i;
                                 }
@@ -286,7 +306,7 @@ namespace Projecto_final_FP_1_
                         }
                     } while (eleccionInfo == 0);
                 }
-                    Console.WriteLine();//separa las lineas en consola para que sean mas legibles
+                Console.WriteLine();//separa las lineas en consola para que sean mas legibles
 
                 Console.Write("Quieres borrar o editarla? elige | '1' para borrar | '2' para editar: ");
                 opcion = int.Parse(Console.ReadLine());
@@ -298,7 +318,6 @@ namespace Projecto_final_FP_1_
                 }
 
                 Console.WriteLine();//separa las lineas en consola para que sean mas legibles
-
 
                 if (opcion == 1)
                 {
@@ -427,7 +446,6 @@ namespace Projecto_final_FP_1_
             string[,] infoVehiculosOriginal = infoVehiculos;
             int eleccionFilaClientes = 0;
             int eleccionFilaVehiculos = 0;
-            bool yaAsignado = false;
             bool todosEspaciosLLenos = true;
             bool borrarConsola = true;
 
@@ -613,6 +631,83 @@ namespace Projecto_final_FP_1_
             }
 
             Console.WriteLine();
+        }
+
+        static string[,] ActualizarVehiculos(string[,] infoDeVehiculos, string[,] infoDeClientes, string[,] infoClientesOriginal)
+        {
+            string[] cedulasOriginales = new string[infoClientesOriginal.GetLength(0)-1];//el -1 porque la primera fila no cuenta
+            string[] cedulasActualizadas = new string[infoDeClientes.GetLength(0)-1];//el -1 porque la primera fila no cuenta
+            int posicionEncontrada = 0;
+            bool actualizacionEncontrada = false;
+
+            for (int i = 1; i < cedulasOriginales.Length; i++)//asigna las cedulas originales
+            {
+                cedulasOriginales[i] = infoClientesOriginal[i + 1, 1];//en i+1 para que se salte la primera fila
+            }
+
+            for (int i = 1; i < cedulasActualizadas.Length; i++)//asigna las cedulas Actualizadas
+            {
+                cedulasActualizadas[i] = infoDeClientes[i + 1, 1];//en i+1 para que se salte la primera fila
+            }
+
+            if (infoClientesOriginal.GetLength(0) == infoClientesOriginal.GetLength(0))//Si solamente se edito un cliente.
+            {//A continuacion se hará un ciclo de ciclos. Se revisará cada cedula individualmente. En el ciclo secundario si se encuentra una cedula coincidente guarda las posiciones y sale del cliclo. Afuera cambia la cedula
+                int posicionCedula = 0; //Como es un contador y al mismo tiempo un indice debe estar en -1
+
+                do //Afuera cambia en cedulasOriginales[]
+                {
+                    actualizacionEncontrada = true;
+                    for (int i = 0; i < infoDeClientes.GetLength(0); i++) //adentro cambia en cedulasActualizadas[]
+                    {
+                        if (cedulasOriginales[posicionCedula] == infoDeClientes[i,1]) //En este for loop, si se encuentra al menos 1 cedula coincidente desde las cedulas originales entonces esa no fue la que se cambió. Si no se encuentra nada entonces se sale del ciclo
+                        {
+                            actualizacionEncontrada = false;
+                            i = cedulasActualizadas.Length - 1;
+                        }
+                    }
+
+                    posicionEncontrada = posicionCedula;
+                    posicionCedula++;
+                } while (actualizacionEncontrada == false);
+
+                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //Finalmente se actualiza la cedula
+                {
+                    if(infoDeVehiculos[i, 4] == cedulasOriginales[posicionEncontrada]) //Se encuentra la cedula que antes existia en vehículos y se cambia por la nueva.
+                    {
+                        infoDeVehiculos[i, 4] = cedulasActualizadas[posicionEncontrada]; //Le pongo el contador del ciclo porque ambos vectores son iguales.
+                    }
+                }
+            }
+            else if(infoClientesOriginal.GetLength(0) > infoDeClientes.GetLength(1)) //Si se borró un cliente
+            {//De la misma manera que el anterior, Cuando se encuentre la cedula que no coincide en el ciclo de ciclos guarda su posicion y se actualiza al final.
+                int posicionCedula = 0; //Como es un contador y al mismo tiempo un indice debe estar en -1
+
+                while (actualizacionEncontrada == false) //Afuera cambia en cedulasOriginales[]
+                {
+                    actualizacionEncontrada = true;
+                    for (int i = 0; i < cedulasOriginales.Length; i++) //adentro cambia en cedulasActualizadas[]
+                    {
+                        if (cedulasOriginales[posicionCedula] == cedulasActualizadas[i]) //En este for loop, si se encuentra al menos 1 cedula coincidente desde las cedulas originales entonces esa no fue la que se cambió. Si no se encuentra nada entonces se sale del ciclo
+                        {
+                            i = cedulasOriginales.GetLength(0) - 1; //para que salga del ciclo
+                            actualizacionEncontrada = false;
+                        }
+                    }
+
+                    posicionEncontrada = posicionCedula;
+                    posicionCedula++;
+                }
+
+                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //Finalmente se actualiza la cedula
+                {
+                    if (infoDeVehiculos[i, 4] == cedulasOriginales[posicionEncontrada]) //Se encuentra la cedula que antes existia en vehículos y se cambia por la nueva.
+                    {
+                        infoDeVehiculos[i, 4] = null; //Le pongo el contador del ciclo porque ambos vectores son iguales.
+                    }
+                }
+            }
+
+            return infoDeVehiculos;
         }
     }
 }
