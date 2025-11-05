@@ -44,6 +44,8 @@ namespace Projecto_final_FP_1_
                 Console.Write("Elige: ");
                 opcion = int.Parse(Console.ReadLine());
 
+                string[,] infoClientesOriginal = informacionDeClientes_0; //para actualizar los vehiculos asignados
+
                 if (opcion < 1 || opcion > 4)
                 {
                     do
@@ -56,10 +58,11 @@ namespace Projecto_final_FP_1_
                 switch (opcion)
                 {
                     case 1:
-                        string[,] infoClientesOriginal = informacionDeClientes_0; //para actualizar los vehiculos asignados
-
                         Console.Clear();
                         informacionDeClientes_0 = GestionDeClientes(informacionDeClientes_0, informacionVehículos_0);
+
+                        MostrarMatriz(infoClientesOriginal, 1);
+                        string popo = Console.ReadLine();
 
                         if(informacionVehículos_0.GetLength(1) > 4) //Si ya hay asignaciones
                         {
@@ -406,21 +409,21 @@ namespace Projecto_final_FP_1_
                     {
                         for (int j = 0; j < 5; j++)
                         {
-                            if(j < 4)
-                            {
+                            //if(j < 4)
+                            //{
                                 Console.Write($"|      {matrizElegida[i, j]}      |");
-                            }
-                            else if (j == 4 && i > 0)
-                            {
-                                if (matrizElegida[i, 4] == null)
-                                {
-                                    Console.Write("||| No asignado");
-                                }
-                                else if (matrizElegida[i, 4] != null)
-                                {
-                                    Console.Write("||| Asignado");
-                                }
-                            }
+                            //}
+                            //else if (j == 4 && i > 0)
+                            //{
+                            //    if (matrizElegida[i, 4] == null)
+                            //    {
+                            //        Console.Write("||| No asignado");
+                            //    }
+                            //    else if (matrizElegida[i, 4] != null)
+                            //    {
+                            //        Console.Write("||| Asignado");
+                            //    }
+                            //}
                         }
                     }
                     else
@@ -635,76 +638,46 @@ namespace Projecto_final_FP_1_
 
         static string[,] ActualizarVehiculos(string[,] infoDeVehiculos, string[,] infoDeClientes, string[,] infoClientesOriginal)
         {
-            string[] cedulasOriginales = new string[infoClientesOriginal.GetLength(0)-1];//el -1 porque la primera fila no cuenta
-            string[] cedulasActualizadas = new string[infoDeClientes.GetLength(0)-1];//el -1 porque la primera fila no cuenta
             int posicionEncontrada = 0;
             bool actualizacionEncontrada = false;
-
-            for (int i = 1; i < cedulasOriginales.Length; i++)//asigna las cedulas originales
-            {
-                cedulasOriginales[i] = infoClientesOriginal[i + 1, 1];//en i+1 para que se salte la primera fila
-            }
-
-            for (int i = 1; i < cedulasActualizadas.Length; i++)//asigna las cedulas Actualizadas
-            {
-                cedulasActualizadas[i] = infoDeClientes[i + 1, 1];//en i+1 para que se salte la primera fila
-            }
 
             if (infoClientesOriginal.GetLength(0) == infoClientesOriginal.GetLength(0))//Si solamente se edito un cliente.
             {//A continuacion se hará un ciclo de ciclos. Se revisará cada cedula individualmente. En el ciclo secundario si se encuentra una cedula coincidente guarda las posiciones y sale del cliclo. Afuera cambia la cedula
                 int posicionCedula = 0; //Como es un contador y al mismo tiempo un indice debe estar en -1
 
-                do //Afuera cambia en cedulasOriginales[]
+                while (actualizacionEncontrada == false)
                 {
                     actualizacionEncontrada = true;
                     for (int i = 0; i < infoDeClientes.GetLength(0); i++) //adentro cambia en cedulasActualizadas[]
                     {
-                        if (cedulasOriginales[posicionCedula] == infoDeClientes[i,1]) //En este for loop, si se encuentra al menos 1 cedula coincidente desde las cedulas originales entonces esa no fue la que se cambió. Si no se encuentra nada entonces se sale del ciclo
+                        if (infoDeVehiculos[posicionCedula, 4] == infoDeClientes[i, 1]) //En este for loop, si se encuentra al menos 1 cedula coincidente desde las cedulas originales entonces esa no fue la que se cambió. Si no se encuentra nada entonces se sale del ciclo y abre el ciclo padre.
                         {
                             actualizacionEncontrada = false;
-                            i = cedulasActualizadas.Length - 1;
                         }
                     }
 
                     posicionEncontrada = posicionCedula;
                     posicionCedula++;
-                } while (actualizacionEncontrada == false);
+                }
+
+                MostrarMatriz(infoDeClientes, 1);
+                Console.WriteLine();
+                MostrarMatriz(infoClientesOriginal, 1);
+                string xd = Console.ReadLine();
 
                 for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //Finalmente se actualiza la cedula
                 {
-                    if(infoDeVehiculos[i, 4] == cedulasOriginales[posicionEncontrada]) //Se encuentra la cedula que antes existia en vehículos y se cambia por la nueva.
+                    if(infoDeVehiculos[i, 4] == infoClientesOriginal[posicionEncontrada,1]) //Se encuentra la cedula que antes existia en vehículos y se cambia por la nueva.
                     {
-                        infoDeVehiculos[i, 4] = cedulasActualizadas[posicionEncontrada]; //Le pongo el contador del ciclo porque ambos vectores son iguales.
+                        infoDeVehiculos[i, 4] = infoDeClientes[posicionEncontrada,1]; 
                     }
                 }
+
+                MostrarMatriz(infoDeVehiculos, 2);
             }
             else if(infoClientesOriginal.GetLength(0) > infoDeClientes.GetLength(1)) //Si se borró un cliente
             {//De la misma manera que el anterior, Cuando se encuentre la cedula que no coincide en el ciclo de ciclos guarda su posicion y se actualiza al final.
-                int posicionCedula = 0; //Como es un contador y al mismo tiempo un indice debe estar en -1
 
-                while (actualizacionEncontrada == false) //Afuera cambia en cedulasOriginales[]
-                {
-                    actualizacionEncontrada = true;
-                    for (int i = 0; i < cedulasOriginales.Length; i++) //adentro cambia en cedulasActualizadas[]
-                    {
-                        if (cedulasOriginales[posicionCedula] == cedulasActualizadas[i]) //En este for loop, si se encuentra al menos 1 cedula coincidente desde las cedulas originales entonces esa no fue la que se cambió. Si no se encuentra nada entonces se sale del ciclo
-                        {
-                            i = cedulasOriginales.GetLength(0) - 1; //para que salga del ciclo
-                            actualizacionEncontrada = false;
-                        }
-                    }
-
-                    posicionEncontrada = posicionCedula;
-                    posicionCedula++;
-                }
-
-                for (int i = 0; i < infoDeVehiculos.GetLength(0); i++) //Finalmente se actualiza la cedula
-                {
-                    if (infoDeVehiculos[i, 4] == cedulasOriginales[posicionEncontrada]) //Se encuentra la cedula que antes existia en vehículos y se cambia por la nueva.
-                    {
-                        infoDeVehiculos[i, 4] = null; //Le pongo el contador del ciclo porque ambos vectores son iguales.
-                    }
-                }
             }
 
             return infoDeVehiculos;
